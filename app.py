@@ -1,10 +1,11 @@
 import streamlit as st
 import requests
 import json
+import random
 
 # --- Configurações Iniciais ---
 st.set_page_config(
-    page_title="Migrador - Gerador de Fórmulas",
+    page_title="TAM IA",
     page_icon="✨",
     layout="wide" # Layout wide para melhor visualização de fórmulas complexas
 )
@@ -12,28 +13,76 @@ st.set_page_config(
 # Constante do Webhook - INSIRA SUA URL AQUI
 WEBHOOK_URL = st.secrets["webhook_url"]
 
-
-# --- Barra Lateral (UX e Controles) ---
 with st.sidebar:
-    st.title("ⓘ Info")
-    st.caption("Gere fórmulas para o sistema avaliativo de forma automatizada.")
+    st.image("	https://cdn.siga.activesoft.com.br/siga-producao/logo_brand_activesoft_completa.png", width=800) # Opcional: ícone/logo
+    st.markdown("<div style='text-align: center; color: grey; font-size: 12px;'> ⚡ Powered by <b>Enablement team</b></div>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.title("Assistente de Fórmulas")
+    st.caption("Gere lógicas para o Activesoft de forma automatizada.")
+    
+    # --- Seção 1: O que a ferramenta sabe? (Cheat Sheet) ---
+    st.markdown("### 🧠 Base de Conhecimento")
+    st.info("Eu conheço a sintaxe oficial do Activesoft (variáveis, funções e regras de arredondamento).")
+
+    with st.expander("📚 Dicionário de Variáveis"):
+        st.markdown("""
+        **Notas:**
+        * `[NF01]`: Nota da Fase 01 (ex: 1º Bimestre)
+        * `[NC01]`: Nota de Composição 01 (ex: Prova)
+        
+        **Faltas:**
+        * `[FF01]`: Faltas da Fase 01
+        * `[QF01]`: Qtde. Faltas (Total)
+        * `[AD01]`: Aulas Dadas
+        
+        **Outros:**
+        * `[MEDIA]`: Média calculada
+        * `[SIGLADISCIPLINA]`: Sigla da matéria atual
+        """)
+
+    with st.expander("➗ Funções Principais"):
+        st.markdown("""
+        * **Condicional:** `IF(condição, verdadeiro, falso)`
+        * **Comparação:** `MAIOR(v1, v2)` ou `MENOR(v1, v2)`
+        * **Média Inteligente:** `MEDIA_NOTAS_INFORMADAS(...)`
+        * **Arredondamento:** `ARREDONDAR05(valor)`, `TRUNC(valor)`, etc.
+        """)
+
+    with st.expander("💡 Exemplos de Prompts"):
+        st.markdown("**Copie e adapte:**")
+        
+        st.markdown("🔹 *Média Simples*")
+        st.code("Crie uma fórmula de Média Anual somando [NF01], [NF02], [NF03] e dividindo por 3.")
+        
+        st.markdown("🔹 *Recuperação*")
+        st.code("Se a [NF04] for >= 7, mantém ela. Senão, faz a média entre [NF04] e a Recuperação [NF05].")
+        
+        st.markdown("🔹 *Arredondamento*")
+        st.code("Arredonde a média final para 0.5 (ex: 7.2 vira 7.5) usando as regras do Activesoft.")
     
     st.markdown("---")
     
-    # Botão de Limpar com confirmação visual melhorada
+    # --- Controles da Sessão ---
     if st.button("🗑️ Limpar Conversa", type="primary", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
-        
-    st.markdown("---")
-    st.markdown("Made with ❤️ by **Enablement**")
+
+    st.markdown("### Suporte")
+    st.markdown("Encontrou um erro ou a fórmula não funcionou?")
+    st.link_button("🎫 Abrir Ticket Enablement", "https://arco.enterprise.slack.com/archives/C081H84965V", help="Fale com o time de suporte.")
+
+
 
 # --- Interface Principal ---
 st.title("֎ Gerador de Fórmulas Avaliativas")
-st.markdown("""
-Bem-vindo ao assistente do Migrador. Descreva a lógica da avaliação e eu gerarei a fórmula correspondente.
-""")
-
+with st.container():
+    st.markdown("""
+    Este assistente traduz regras de negócio pedagógicas para a sintaxe de fórmulas do **Activesoft**.
+    
+    **Como usar:**
+    1. Descreva a regra de cálculo (ex: média ponderada, recuperação, faltas).
+    2. O assistente gerará a fórmula pronta para copiar e colar.
+    """)
 # --- Lógica de Comunicação com Webhook ---
 def enviar_para_webhook(prompt_usuario, historico):
     """
@@ -71,12 +120,18 @@ def enviar_para_webhook(prompt_usuario, historico):
             
         return str(dados)
         
+    # except requests.exceptions.RequestException as e:
+    #     return f"❌ Erro de conexão com o Webhook: {str(e)}"
+    # except json.JSONDecodeError:
+    #     return f"❌ Erro: A resposta do servidor não é um JSON válido. Resposta crua: {response.text}"
+    # except Exception as e:
+    #     return f"❌ Erro inesperado ao processar resposta: {str(e)}"
     except requests.exceptions.RequestException as e:
-        return f"❌ Erro de conexão com o Webhook: {str(e)}"
+        return f"❌ Erro inesperado, abra um ticket em #suporte_enablement"
     except json.JSONDecodeError:
-        return f"❌ Erro: A resposta do servidor não é um JSON válido. Resposta crua: {response.text}"
+        return f"❌ Erro inesperado, abra um ticket em #suporte_enablement"
     except Exception as e:
-        return f"❌ Erro inesperado ao processar resposta: {str(e)}"
+        return f"❌ Erro inesperado, abra um ticket em #suporte_enablement"
 
 # --- Gerenciamento do Estado (Histórico) ---
 if "messages" not in st.session_state:
@@ -94,8 +149,19 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-# --- Input do Usuário ---
-if prompt := st.chat_input("Ex: Se nota > 8 e presença > 90%, então Aprovado..."):
+# # --- Input do Usuário ---
+# placeholders_dicas = [
+#     "Ex: Média Aritmética das fases [NF01], [NF02] e [NF03]...",
+#     "Ex: Se a nota [NF04] > 7, aprovado, senão vai para recuperação...",
+#     "Ex: Fórmula para arredondar a nota final em 0.5...",
+#     "Ex: Calcular faltas somando [FF01] + [FF02]...",
+#     "Ex: Média Ponderada: NF01 (peso 1) e NF02 (peso 2)...",
+#     "Ex: Reprovar se a frequência for menor que 75%..."
+# ]
+
+# placeholder_atual = random.choice(placeholders_dicas)
+
+if prompt := st.chat_input("Ex: Média Aritmética das fases [NF01], [NF02] e [NF03]..."):
     
     # 1. Exibir mensagem do usuário
     with st.chat_message("user", avatar="🧑‍💻"):
