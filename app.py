@@ -10,7 +10,8 @@ st.set_page_config(
 )
 
 # Constante do Webhook - INSIRA SUA URL AQUI
-WEBHOOK_URL = "https://n8n-classapp.vyveei.easypanel.host/webhook/migrador-enablement/teste"
+WEBHOOK_URL = st.secrets["webhook_url"]
+
 
 # --- Barra Lateral (UX e Controles) ---
 with st.sidebar:
