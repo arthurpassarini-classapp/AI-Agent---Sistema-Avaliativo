@@ -10,42 +10,15 @@ st.set_page_config(
     layout="wide"
 )
 
-# Constantes dos Webhooks - com fallback para evitar erros
-try:
-    # Debug: Mostrar todas as chaves disponíveis
-    st.sidebar.write("🔍 Debug - Chaves disponíveis:", list(st.secrets.keys()))
-    
-    # Tenta usar as chaves específicas
-    if "webhook_avaliativo" in st.secrets:
-        WEBHOOK_AVALIATIVO = st.secrets["webhook_avaliativo"]
-        st.sidebar.success(f"✅ WEBHOOK_AVALIATIVO carregado: {WEBHOOK_AVALIATIVO[:50]}...")
-    elif "webhook_url" in st.secrets:
-        WEBHOOK_AVALIATIVO = st.secrets["webhook_url"]
-        st.sidebar.info(f"ℹ️ Usando webhook_url: {WEBHOOK_AVALIATIVO[:50]}...")
-    else:
-        WEBHOOK_AVALIATIVO = None
-        st.sidebar.error("❌ WEBHOOK_AVALIATIVO não encontrado")
-    
-    if "webhook_cnab" in st.secrets:
-        WEBHOOK_CNAB = st.secrets["webhook_cnab"]
-        st.sidebar.success(f"✅ WEBHOOK_CNAB carregado: {WEBHOOK_CNAB[:50]}...")
-    else:
-        WEBHOOK_CNAB = None
-        st.sidebar.error("❌ WEBHOOK_CNAB não encontrado")
-except Exception as e:
-    # Fallback caso secrets não esteja configurado
-    st.sidebar.error(f"❌ Erro ao carregar secrets: {e}")
-    WEBHOOK_AVALIATIVO = None
-    WEBHOOK_CNAB = None
+# Constantes dos Webhooks
+WEBHOOK_AVALIATIVO = st.secrets["webhook_avaliativo"]
+WEBHOOK_CNAB = st.secrets["webhook_cnab"]
 
 # --- Função de Envio para Webhook ---
 def enviar_para_webhook(prompt_usuario, historico, webhook_url):
     """
     Envia a mensagem para o webhook configurado.
     """
-    if not webhook_url or webhook_url == "[INSIRA O WEBHOOK AQUI]":
-        return "⚠️ Erro: A URL do Webhook ainda não foi configurada no arquivo secrets.toml"
-
     headers = {"Content-Type": "application/json"}
     
     payload = {
