@@ -60,7 +60,7 @@ with st.sidebar:
     st.caption("Escolha o agente especializado na aba principal.")
     
     st.markdown("### Agentes:")
-    st.markdown("**📊 Sistema Avaliativo**)
+    st.markdown("**📊 Sistema Avaliativo**")
     st.markdown("**🏦 CNAB Bancário**")
     
     st.markdown("---")
