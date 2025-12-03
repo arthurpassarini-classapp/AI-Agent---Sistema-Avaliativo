@@ -170,51 +170,10 @@ with tab2:
     
     with st.container():
         st.markdown("""
-        Este assistente ajuda no processamento e interpretação de arquivos **CNAB** (Centro Nacional de Automação Bancária).
-        
         **Como usar:**
-        1. Descreva sua dúvida sobre layout CNAB, validação ou processamento.
-        2. O assistente fornecerá orientações e exemplos práticos.
+        1. Envie qual banco deseja saber o CNAB Activesoft, WPensar e se o cliente precisa migrar.
+        2. O assistente fornecerá orientações.
         """)
-    
-    # Expanders com informações específicas
-    with st.expander("🧠 Base de Conhecimento - CNAB"):
-        st.info("Eu conheço os padrões CNAB 240 e CNAB 400, layouts de bancos brasileiros e regras de validação.")
-
-    with st.expander("📋 Tipos de Arquivo CNAB"):
-        st.markdown("""
-        **CNAB 240:**
-        * Formato mais moderno (240 caracteres por linha)
-        * Suporta mais informações e validações
-        * Usado para remessas e retornos complexos
-        
-        **CNAB 400:**
-        * Formato tradicional (400 caracteres por linha)
-        * Amplamente utilizado por bancos
-        * Remessas de boletos e pagamentos
-        """)
-
-    with st.expander("🏦 Bancos Suportados"):
-        st.markdown("""
-        * Banco do Brasil (001)
-        * Bradesco (237)
-        * Itaú (341)
-        * Santander (033)
-        * Caixa Econômica Federal (104)
-        * E outros...
-        """)
-
-    with st.expander("💡 Exemplos de Prompts"):
-        st.markdown("**Copie e adapte:**")
-        
-        st.markdown("🔹 *Validação de Layout*")
-        st.code("Como validar se um arquivo CNAB 240 está no formato correto do Banco do Brasil?")
-        
-        st.markdown("🔹 *Processamento*")
-        st.code("Quais campos devo extrair do registro tipo 3 de um retorno CNAB 400?")
-        
-        st.markdown("🔹 *Geração*")
-        st.code("Como gerar uma remessa CNAB 240 para boletos do Bradesco?")
     
     # Gerenciamento do Estado - CNAB
     if "messages_cnab" not in st.session_state:
