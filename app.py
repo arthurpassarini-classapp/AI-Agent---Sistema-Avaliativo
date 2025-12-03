@@ -59,9 +59,9 @@ with st.sidebar:
     st.title("Assistentes Disponíveis")
     st.caption("Escolha o agente especializado na aba principal.")
     
-    st.markdown("### 🤖 Agentes:")
-    st.markdown("**📊 Sistema Avaliativo** - Fórmulas pedagógicas")
-    st.markdown("**🏦 CNAB Bancário** - Processamento de arquivos bancários")
+    st.markdown("### Agentes:")
+    st.markdown("**📊 Sistema Avaliativo**)
+    st.markdown("**🏦 CNAB Bancário**")
     
     st.markdown("---")
     
