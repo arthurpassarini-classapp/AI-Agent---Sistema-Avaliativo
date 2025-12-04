@@ -176,12 +176,15 @@ with tab2:
         3. Pergunte algo como:
            - "Valide esses dados"
            - "Há alguma inconsistência nesses dados?"
+           - "Tenho uma dúvida sobre [campo específico], pode explicar?"
         4. O assistente analisará e mostrará:
            - Os dados que você enviou
            - O que está correto, incorreto ou precisa de ajuste
            - A compatibilidade do CNAB com WPensar e Activesoft
            - As ações necessárias para corrigir
+           - Explicações detalhadas sobre qualquer dúvida pontual de um campo específico do processo de homologação
         """)
+
     
     # Gerenciamento do Estado - CNAB
     if "messages_cnab" not in st.session_state:
