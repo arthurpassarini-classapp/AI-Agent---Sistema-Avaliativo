@@ -171,8 +171,16 @@ with tab2:
     with st.container():
         st.markdown("""
         **Como usar:**
-        1. Envie qual banco deseja saber o CNAB Activesoft, WPensar e se o cliente precisa migrar.
-        2. O assistente fornecerá orientações.
+        1. Copie todo o conteúdo do card de homologação bancária (banco, agência, conta, CNAB, código do cedente, CNPJ/CPF etc.).
+        2. Cole essas informações aqui no assistente, exatamente como estão.
+        3. Pergunte algo como:
+           - "Valide esses dados"
+           - "Há alguma inconsistência nesses dados?"
+        4. O assistente analisará e mostrará:
+           - Os dados que você enviou
+           - O que está correto, incorreto ou precisa de ajuste
+           - A compatibilidade do CNAB com WPensar e Activesoft
+           - As ações necessárias para corrigir
         """)
     
     # Gerenciamento do Estado - CNAB
