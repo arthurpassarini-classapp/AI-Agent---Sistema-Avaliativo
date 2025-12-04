@@ -6,7 +6,7 @@ import random
 # --- Configurações Iniciais ---
 st.set_page_config(
     page_title="TAM IA",
-    page_icon="✨",
+    page_icon="🤖",
     layout="wide"
 )
 
@@ -70,7 +70,7 @@ with st.sidebar:
     st.link_button("🎫 Abrir Ticket Enablement", "https://arco.enterprise.slack.com/archives/C081H84965V", help="Fale com o time de suporte.")
 
 # --- Título Principal ---
-st.title("✨ TAM IA - Assistentes Especializados")
+st.title("🤖 TAM IA - Assistentes Especializados")
 
 # --- Criação das Abas ---
 tab1, tab2 = st.tabs(["📊 Sistema Avaliativo", "🏦 CNAB Bancário"])
