@@ -234,8 +234,8 @@ import streamlit as st
 
 with tab3:
 
-    st.title("🧱 Construtor do Sistema Avaliativo")
-    st.caption("Envie PDFs diretamente para o Pipefy via webhook.")
+    st.title("🛠️ Construtor do Sistema Avaliativo")
+    st.caption("Envie em anexo o boletim escolar.")
 
     st.divider()
 
@@ -266,7 +266,7 @@ with tab3:
         # ------------------------------------------------------------
         # 3) BOTÃO → ENVIAR PARA WEBHOOK (SEM PROCESSAR)
         # ------------------------------------------------------------
-        if st.button("📬 Enviar para Webhook", type="primary"):
+        if st.button("📬 Construir sistema avaliativo", type="primary"):
 
             if not card_id:
                 st.error("❌ Você precisa informar o ID do card.")
