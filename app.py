@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import json
+import time 
 import random
 
 # --- Configurações Iniciais ---
@@ -72,8 +73,12 @@ with st.sidebar:
 # --- Título Principal ---
 st.title("🤖 TAM IA - Assistentes Especializados")
 
-# --- Criação das Abas ---
-tab1, tab2 = st.tabs(["📊 Sistema Avaliativo", "🏦 CNAB Bancário"])
+tab1, tab2, tab3 = st.tabs([
+    "📊 Assistente Sistema Avaliativo",
+    "🏦 Assistente Homologação Bancária",
+    "🛠️ Construtor Sistema Avaliativo"
+])
+
 
 # ============================================================================
 # ABA 1: SISTEMA AVALIATIVO
@@ -217,3 +222,104 @@ with tab2:
     if st.button("🗑️ Limpar Conversa - CNAB", key="clear_cnab"):
         st.session_state.messages_cnab = []
         st.rerun()
+
+# ======================================================================
+# ABA 3: CONSTRUTOR SISTEMA AVALIATIVO
+# ======================================================================
+
+import base64
+import time
+import requests
+import streamlit as st
+
+with tab3:
+
+    st.title("🧱 Construtor do Sistema Avaliativo")
+    st.caption("Envie PDFs diretamente para o Pipefy via webhook.")
+
+    st.divider()
+
+    # ------------------------------------------------------------
+    # 1) ID DO CARD
+    # ------------------------------------------------------------
+    card_id = st.text_input(
+        "🔖 Digite o ID do Card do Pipefy:",
+        placeholder="Ex.: 123456789"
+    )
+
+    st.divider()
+
+    # ------------------------------------------------------------
+    # 2) UPLOAD PDF
+    # ------------------------------------------------------------
+    uploaded_files = st.file_uploader(
+        "📄 Anexe o(s) arquivo(s) PDF",
+        type="pdf",
+        accept_multiple_files=True
+    )
+
+    if uploaded_files:
+        st.success(f"{len(uploaded_files)} arquivo(s) carregado(s).")
+
+        st.divider()
+
+        # ------------------------------------------------------------
+        # 3) BOTÃO → ENVIAR PARA WEBHOOK (SEM PROCESSAR)
+        # ------------------------------------------------------------
+        if st.button("📬 Enviar para Webhook", type="primary"):
+
+            if not card_id:
+                st.error("❌ Você precisa informar o ID do card.")
+                st.stop()
+
+            st.info("⏳ Preparando arquivos e enviando...")
+
+            arquivos_codificados = []
+
+            # Converte todos os PDFs para base64
+            for file in uploaded_files:
+
+                st.write(f"🔁 Codificando **{file.name}**...")
+
+                file_bytes = file.getvalue()
+                file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+
+                arquivos_codificados.append({
+                    "nome": file.name,
+                    "base64": file_b64
+                })
+
+                time.sleep(0.3)  # apenas para UX
+
+            # ------------------------------------------------------------
+            # Payload final
+            # ------------------------------------------------------------
+            payload = {
+                "card_id": card_id,
+                "arquivos": arquivos_codificados
+            }
+
+            # ------------------------------------------------------------
+            # Webhook
+            # ------------------------------------------------------------
+            try:
+                webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
+
+                response = requests.post(
+                    webhook_url,
+                    json=payload,
+                    timeout=30
+                )
+
+                st.success("🎉 Enviado com sucesso!")
+
+                try:
+                    result = response.json()
+                except:
+                    result = {"raw_response": response.text}
+
+                st.markdown("### 📦 Resposta do Webhook:")
+                st.json(result)
+
+            except Exception as e:
+                st.error(f"❌ Erro ao enviar para o webhook: {e}")
