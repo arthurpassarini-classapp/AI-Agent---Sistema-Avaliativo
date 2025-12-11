@@ -308,7 +308,7 @@ with tab3:
                 response = requests.post(
                     webhook_url,
                     json=payload,
-                    timeout=30
+                    timeout=150
                 )
 
                 st.success("🎉 Enviado com sucesso!")
