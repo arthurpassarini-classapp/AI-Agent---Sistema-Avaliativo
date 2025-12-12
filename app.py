@@ -258,7 +258,6 @@ with tab3:
 
     if uploaded_files:
         st.success(f"{len(uploaded_files)} arquivo(s) carregado(s).")
-
         st.divider()
 
     # ------------------------------------------------------------
@@ -311,22 +310,19 @@ with tab3:
             }
 
             # ------------------------------------------------------------
-            # Envio ao Webhook
-            # ------------------------------------------------------------
-            # ------------------------------------------------------------
             # ENVIO PARA O WEBHOOK
             # ------------------------------------------------------------
             try:
                 webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
-            
+
                 response = requests.post(
                     webhook_url,
                     json=payload,
                     timeout=150
                 )
-            
+
                 st.success("🎉 Enviado com sucesso!")
-            
+
                 # --------------------------------------------------------
                 # Tratamento da resposta
                 # --------------------------------------------------------
@@ -334,40 +330,37 @@ with tab3:
                     result = response.json()
                 except:
                     result = {"raw_response": response.text}
-            
+
                 # 🔥 Salva o JSON completo no estado
                 st.session_state.webhook_response = result
                 st.session_state.webhook_finalizado = True
-            
+
                 st.rerun()
-            
+
             except Exception as e:
                 st.error(f"❌ Erro ao enviar para o webhook: {e}")
-            
-            
-            # ------------------------------------------------------------
-            # EXIBIR A RESPOSTA DEPOIS DO RERUN
-            # ------------------------------------------------------------
-            if st.session_state.get("webhook_response"):
-                st.markdown("### 📦 Resposta do Webhook:")
-                
-                import json
-                response_data = st.session_state.webhook_response
-                
-                # Extrair o campo 'data'
-                if isinstance(response_data, list) and len(response_data) > 0:
-                    data = response_data[0].get("data", {})
-                elif isinstance(response_data, dict):
-                    data = response_data.get("data", response_data)
-                else:
-                    data = response_data
-                
-                st.code(
-                    json.dumps(
-                        data,
-                        indent=2,
-                        ensure_ascii=False
-                    ),
-                    language="json"
-                )
 
+    # ------------------------------------------------------------
+    # EXIBIR A RESPOSTA DEPOIS DO RERUN (FORA DO IF/TRY)
+    # ------------------------------------------------------------
+    if st.session_state.get("webhook_response"):
+        st.markdown("### 📦 Resposta do Webhook:")
+
+        response_data = st.session_state.webhook_response
+
+        # Extrair o campo 'data'
+        if isinstance(response_data, list) and len(response_data) > 0:
+            data = response_data[0].get("data", {})
+        elif isinstance(response_data, dict):
+            data = response_data.get("data", response_data)
+        else:
+            data = response_data
+
+        st.code(
+            json.dumps(
+                data,
+                indent=2,
+                ensure_ascii=False
+            ),
+            language="json"
+        )
