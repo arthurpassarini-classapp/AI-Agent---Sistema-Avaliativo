@@ -261,68 +261,91 @@ with tab3:
 
         st.divider()
 
-# ------------------------------------------------------------
-# CONTROLE DE ESTADO – só mostra botões se ainda não enviou
-# ------------------------------------------------------------
-if "webhook_finalizado" not in st.session_state:
-    st.session_state.webhook_finalizado = False
+    # ------------------------------------------------------------
+    # CONTROLE DE ESTADO
+    # ------------------------------------------------------------
+    if "webhook_finalizado" not in st.session_state:
+        st.session_state.webhook_finalizado = False
 
+    # ------------------------------------------------------------
+    # RENDERIZAÇÃO CONDICIONAL DOS BOTÕES
+    # ------------------------------------------------------------
+    if not st.session_state.webhook_finalizado:
 
-# ------------------------------------------------------------
-# RENDERIZAÇÃO CONDICIONAL DOS BOTÕES
-# ------------------------------------------------------------
-if not st.session_state.webhook_finalizado:
+        if st.button("📬 Construir sistema avaliativo", type="primary"):
 
-    if st.button("📬 Construir sistema avaliativo", type="primary"):
+            if not card_id:
+                st.error("❌ Você precisa informar o ID do card.")
+                st.stop()
 
-        if not card_id:
-            st.error("❌ Você precisa informar o ID do card.")
-            st.stop()
+            if not uploaded_files:
+                st.error("❌ Você precisa anexar pelo menos um PDF.")
+                st.stop()
 
-        st.info("⏳ Preparando arquivos e enviando...")
+            st.info("⏳ Preparando arquivos e enviando...")
 
-        arquivos_codificados = []
+            arquivos_codificados = []
 
-        # Converte todos os PDFs para base64
-        for file in uploaded_files:
-            st.write(f"🔁 Codificando **{file.name}**...")
-            file_bytes = file.getvalue()
-            file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+            # ------------------------------------------------------------
+            # Converte PDFs para Base64
+            # ------------------------------------------------------------
+            for file in uploaded_files:
+                st.write(f"🔁 Codificando **{file.name}**...")
 
-            arquivos_codificados.append({
-                "nome": file.name,
-                "base64": file_b64
-            })
+                file_bytes = file.getvalue()
+                file_b64 = base64.b64encode(file_bytes).decode("utf-8")
 
-            time.sleep(0.3)
+                arquivos_codificados.append({
+                    "nome": file.name,
+                    "base64": file_b64
+                })
 
-        payload = {
-            "card_id": card_id,
-            "arquivos": arquivos_codificados
-        }
+                time.sleep(0.3)
 
-        try:
-            webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
+            # ------------------------------------------------------------
+            # Payload
+            # ------------------------------------------------------------
+            payload = {
+                "card_id": card_id,
+                "arquivos": arquivos_codificados
+            }
 
-            response = requests.post(
-                webhook_url,
-                json=payload,
-                timeout=150
-            )
-
-            st.success("🎉 Enviado com sucesso!")
-
+            # ------------------------------------------------------------
+            # Envio ao Webhook
+            # ------------------------------------------------------------
             try:
-                result = response.json()
-            except:
-                result = {"raw_response": response.text}
+                webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
 
-            st.markdown("### 📦 Resposta do Webhook:")
-            st.json(result)
+                response = requests.post(
+                    webhook_url,
+                    json=payload,
+                    timeout=150
+                )
 
-            # 🔥 Agora faz desaparecer os botões
-            st.session_state.webhook_finalizado = True
-            st.rerun()
+                st.success("🎉 Enviado com sucesso!")
 
-        except Exception as e:
-            st.error(f"❌ Erro ao enviar para o webhook: {e}")
+                # --------------------------------------------------------
+                # Tratamento da resposta
+                # --------------------------------------------------------
+                try:
+                    result = response.json()
+                except:
+                    result = {"raw_response": response.text}
+
+                # Se vier uma lista contendo objeto com "data"
+                if isinstance(result, list) and len(result) > 0:
+                    resposta_final = result[0].get("data", result[0])
+                else:
+                    resposta_final = result
+
+                st.markdown("### 📦 Resposta do Webhook:")
+                st.json(resposta_final)
+
+                # --------------------------------------------------------
+                # Botões desaparecem
+                # --------------------------------------------------------
+                st.session_state.webhook_finalizado = True
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"❌ Erro ao enviar para o webhook: {e}")
