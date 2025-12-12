@@ -165,17 +165,29 @@ with tab1:
 
     
     # Input do Usuário - Avaliativo
-    if prompt_avaliativo := st.chat_input("Ex: Média Aritmética das fases [NF01], [NF02] e [NF03]...", key="input_avaliativo"):
-        with st.chat_message("user", avatar="🧑‍💻"):
-            st.markdown(prompt_avaliativo)
-        st.session_state.messages_avaliativo.append({"role": "user", "content": prompt_avaliativo})
-        
-        with st.chat_message("assistant", avatar="📊"):
-            with st.spinner("Processando..."):
-                resposta_api = enviar_para_webhook(prompt_avaliativo, st.session_state.messages_avaliativo, WEBHOOK_AVALIATIVO)
-                st.markdown(resposta_api)
-        
-        st.session_state.messages_avaliativo.append({"role": "assistant", "content": resposta_api})
+    if prompt_avaliativo := st.chat_input("..."):
+
+    # 1 — adiciona mensagem do usuário
+    st.session_state.messages_avaliativo.append({
+        "role": "user",
+        "content": prompt_avaliativo
+    })
+
+    # 2 — chama a API
+    resposta_api = enviar_para_webhook(
+        prompt_avaliativo,
+        st.session_state.messages_avaliativo,
+        WEBHOOK_AVALIATIVO
+    )
+
+    # 3 — adiciona a resposta da IA ANTES de renderizar
+    st.session_state.messages_avaliativo.append({
+        "role": "assistant",
+        "content": resposta_api
+    })
+
+    # 4 — força um rerun NATURAL com a conversa já atualizada
+    st.rerun()
     
     # Botão de limpar - Avaliativo
     if st.button("🗑️ Limpar Conversa - Avaliativo", key="clear_avaliativo"):
