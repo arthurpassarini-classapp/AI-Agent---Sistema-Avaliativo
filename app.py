@@ -349,25 +349,25 @@ with tab3:
             # EXIBIR A RESPOSTA DEPOIS DO RERUN
             # ------------------------------------------------------------
             if st.session_state.get("webhook_response"):
-            st.markdown("### 📦 Resposta do Webhook:")
-            
-            import json
-            response_data = st.session_state.webhook_response
-            
-            # Extrair o campo 'data'
-            if isinstance(response_data, list) and len(response_data) > 0:
-                data = response_data[0].get("data", {})
-            elif isinstance(response_data, dict):
-                data = response_data.get("data", response_data)
-            else:
-                data = response_data
-            
-            st.code(
-                json.dumps(
-                    data,
-                    indent=2,
-                    ensure_ascii=False
-                ),
-                language="json"
-            )
+                st.markdown("### 📦 Resposta do Webhook:")
+                
+                import json
+                response_data = st.session_state.webhook_response
+                
+                # Extrair o campo 'data'
+                if isinstance(response_data, list) and len(response_data) > 0:
+                    data = response_data[0].get("data", {})
+                elif isinstance(response_data, dict):
+                    data = response_data.get("data", response_data)
+                else:
+                    data = response_data
+                
+                st.code(
+                    json.dumps(
+                        data,
+                        indent=2,
+                        ensure_ascii=False
+                    ),
+                    language="json"
+                )
 
