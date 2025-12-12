@@ -331,21 +331,24 @@ with tab3:
                     result = response.json()
                 except:
                     result = {"raw_response": response.text}
-
-                # Se vier uma lista contendo objeto com "data"
+                
+                # Se vier lista
                 if isinstance(result, list) and len(result) > 0:
                     resposta_final = result[0].get("data", result[0])
                 else:
                     resposta_final = result
-
-                st.markdown("### 📦 Resposta do Webhook:")
-                st.json(resposta_final)
-
-                # --------------------------------------------------------
-                # Botões desaparecem
-                # --------------------------------------------------------
+                
+                # SALVA no session_state para exibir após o rerun
+                st.session_state.webhook_response = resposta_final
                 st.session_state.webhook_finalizado = True
+                
                 st.rerun()
 
             except Exception as e:
                 st.error(f"❌ Erro ao enviar para o webhook: {e}")
+
+    # Exibir resposta depois do rerun
+    if st.session_state.get("webhook_response"):
+        st.markdown("### 📦 Resposta do Webhook:")
+        st.json(st.session_state.webhook_response)
+
