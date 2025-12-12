@@ -148,6 +148,17 @@ with tab1:
         avatar = "🧑‍💻" if message["role"] == "user" else "📊"
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
+
+    # Força o scroll para o final do chat
+    st.markdown("""
+        <script>
+            var chatDivs = window.parent.document.querySelectorAll('[data-testid="stChatMessage"]');
+            if (chatDivs.length > 0) {
+                chatDivs[chatDivs.length - 1].scrollIntoView({ behavior: "smooth" });
+            }
+        </script>
+    """, unsafe_allow_html=True)
+
     
     # Input do Usuário - Avaliativo
     if prompt_avaliativo := st.chat_input("Ex: Média Aritmética das fases [NF01], [NF02] e [NF03]...", key="input_avaliativo"):
@@ -204,6 +215,16 @@ with tab2:
         avatar = "🧑‍💻" if message["role"] == "user" else "🏦"
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
+    # Força o scroll para o final do chat
+    st.markdown("""
+        <script>
+            var chatDivs = window.parent.document.querySelectorAll('[data-testid="stChatMessage"]');
+            if (chatDivs.length > 0) {
+                chatDivs[chatDivs.length - 1].scrollIntoView({ behavior: "smooth" });
+            }
+        </script>
+    """, unsafe_allow_html=True)
+
     
     # Input do Usuário - CNAB
     if prompt_cnab := st.chat_input("Ex: Como validar um arquivo CNAB 240 do Itaú?", key="input_cnab"):
