@@ -235,7 +235,7 @@ import streamlit as st
 with tab3:
 
     st.title("🛠️ Construtor do Sistema Avaliativo")
-    st.caption("Envie em anexo o boletim escolar.")
+    st.caption("Essa ferramenta é responsável pela construção lógica do sistema avaliativo de todos os níveis de ensino.")
 
     st.divider()
 
@@ -244,10 +244,8 @@ with tab3:
     # ------------------------------------------------------------
     card_id = st.text_input(
         "🔖 Digite o ID do Card do Pipefy:",
-        placeholder="Ex.: 123456789"
+        placeholder="Ex.: Extrai o card ID 1234 do link <https://app.pipefy.com/open-cards/1234>"
     )
-
-    st.divider()
 
     # ------------------------------------------------------------
     # 2) UPLOAD PDF
@@ -263,63 +261,68 @@ with tab3:
 
         st.divider()
 
-        # ------------------------------------------------------------
-        # 3) BOTÃO → ENVIAR PARA WEBHOOK (SEM PROCESSAR)
-        # ------------------------------------------------------------
-        if st.button("📬 Construir sistema avaliativo", type="primary"):
+# ------------------------------------------------------------
+# CONTROLE DE ESTADO – só mostra botões se ainda não enviou
+# ------------------------------------------------------------
+if "webhook_finalizado" not in st.session_state:
+    st.session_state.webhook_finalizado = False
 
-            if not card_id:
-                st.error("❌ Você precisa informar o ID do card.")
-                st.stop()
 
-            st.info("⏳ Preparando arquivos e enviando...")
+# ------------------------------------------------------------
+# RENDERIZAÇÃO CONDICIONAL DOS BOTÕES
+# ------------------------------------------------------------
+if not st.session_state.webhook_finalizado:
 
-            arquivos_codificados = []
+    if st.button("📬 Construir sistema avaliativo", type="primary"):
 
-            # Converte todos os PDFs para base64
-            for file in uploaded_files:
+        if not card_id:
+            st.error("❌ Você precisa informar o ID do card.")
+            st.stop()
 
-                st.write(f"🔁 Codificando **{file.name}**...")
+        st.info("⏳ Preparando arquivos e enviando...")
 
-                file_bytes = file.getvalue()
-                file_b64 = base64.b64encode(file_bytes).decode("utf-8")
+        arquivos_codificados = []
 
-                arquivos_codificados.append({
-                    "nome": file.name,
-                    "base64": file_b64
-                })
+        # Converte todos os PDFs para base64
+        for file in uploaded_files:
+            st.write(f"🔁 Codificando **{file.name}**...")
+            file_bytes = file.getvalue()
+            file_b64 = base64.b64encode(file_bytes).decode("utf-8")
 
-                time.sleep(0.3)  # apenas para UX
+            arquivos_codificados.append({
+                "nome": file.name,
+                "base64": file_b64
+            })
 
-            # ------------------------------------------------------------
-            # Payload final
-            # ------------------------------------------------------------
-            payload = {
-                "card_id": card_id,
-                "arquivos": arquivos_codificados
-            }
+            time.sleep(0.3)
 
-            # ------------------------------------------------------------
-            # Webhook
-            # ------------------------------------------------------------
+        payload = {
+            "card_id": card_id,
+            "arquivos": arquivos_codificados
+        }
+
+        try:
+            webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
+
+            response = requests.post(
+                webhook_url,
+                json=payload,
+                timeout=150
+            )
+
+            st.success("🎉 Enviado com sucesso!")
+
             try:
-                webhook_url = st.secrets["webhook_construtor_sistema_avaliativo"]
+                result = response.json()
+            except:
+                result = {"raw_response": response.text}
 
-                response = requests.post(
-                    webhook_url,
-                    json=payload,
-                    timeout=150
-                )
+            st.markdown("### 📦 Resposta do Webhook:")
+            st.json(result)
 
-                st.success("🎉 Enviado com sucesso!")
+            # 🔥 Agora faz desaparecer os botões
+            st.session_state.webhook_finalizado = True
+            st.rerun()
 
-                try:
-                    result = response.json()
-                except:
-                    result = {"raw_response": response.text}
-
-                st.markdown("### 📦 Resposta do Webhook:")
-                st.json(result)
-
-            except Exception as e:
-                st.error(f"❌ Erro ao enviar para o webhook: {e}")
+        except Exception as e:
+            st.error(f"❌ Erro ao enviar para o webhook: {e}")
