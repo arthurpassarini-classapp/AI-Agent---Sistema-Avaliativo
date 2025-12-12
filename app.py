@@ -149,14 +149,18 @@ with tab1:
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
 
-    # Força o scroll para o final do chat
+    # 🔥Âncora no final da conversa
+    scroll_anchor = st.empty()
+    scroll_anchor.markdown("<div id='scroll_end_avaliativo'></div>", unsafe_allow_html=True)
+    
+    # 🔥Força scroll até a âncora
     st.markdown("""
-        <script>
-            var chatDivs = window.parent.document.querySelectorAll('[data-testid="stChatMessage"]');
-            if (chatDivs.length > 0) {
-                chatDivs[chatDivs.length - 1].scrollIntoView({ behavior: "smooth" });
-            }
-        </script>
+    <script>
+    const end = window.parent.document.getElementById('scroll_end_avaliativo');
+    if (end) {
+        end.scrollIntoView({behavior: "smooth", block: "end"});
+    }
+    </script>
     """, unsafe_allow_html=True)
 
     
